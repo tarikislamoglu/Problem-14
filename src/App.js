@@ -13,6 +13,7 @@ const cartProducts = [
     imageSrc: "/product-01.jpg",
     imageAlt: "Front of men's Basic Tee in black.",
     quantity: 1,
+    delete: false,
   },
   {
     id: 2,
@@ -24,6 +25,7 @@ const cartProducts = [
     imageSrc: "/product-02.jpg",
     imageAlt: "Front of men's Basic Tee in sienna.",
     quantity: 1,
+    delete: false,
   },
 ];
 
@@ -48,7 +50,6 @@ export default function OrderSummary() {
   const [productsPrice, setProductsPrice] = useState(0);
   const transferPrice = 5;
   const [total, setTotal] = useState(0);
-  const [isDelete, setIsDelete] = useState(false);
 
   useEffect(() => {
     const updatedPrice = products.reduce((total, product) => {
@@ -62,15 +63,24 @@ export default function OrderSummary() {
   }, [productsPrice]);
 
   const handleDeleteClick = (id) => {
+    const deletedProduct = products.map((product) =>
+      product.id === id ? { ...product, delete: true } : product
+    );
+    setProducts(deletedProduct);
     if (confirm("Ürünü kaldırmak istediğinizden eminmisiniz?")) {
-      setIsDelete(true);
       const updatedProducts = products.filter((product) => product.id !== id);
       setTimeout(() => {
-        setIsDelete(false);
+        deletedProduct.delete = false;
         setProducts(updatedProducts);
       }, 1000);
+    } else {
+      const deletedProduct = products.map((product) =>
+        product.id === id ? { ...product, delete: false } : product
+      );
+      setProducts(deletedProduct);
     }
   };
+
   const handleDecreaseClick = (id) => {
     const updatedProducts = products.map((product) =>
       product.id === id
@@ -159,7 +169,7 @@ export default function OrderSummary() {
                         onClick={() => handleDeleteClick(product.id)}
                       >
                         <span className="sr-only">Kaldır</span>
-                        {isDelete ? (
+                        {product.delete ? (
                           <p className="w-[10px] text-center">
                             Kaldırılıyor...
                           </p>
